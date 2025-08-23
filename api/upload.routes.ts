@@ -17,22 +17,25 @@ const upload = multer({
 
 router.post('/', checkAuth, upload.single('file'), async (req: Request, res: Response) => {
     
-    if (!req.user) {
-        return res.status(401).json({ error: 'Não autorizado.' });
-    }
-    if (!req.file) {
-      return res.status(400).json({ error: 'Nenhum ficheiro enviado.' });
+    // As nossas verificações de segurança continuam aqui. Elas garantem a lógica.
+    if (!req.user || !req.file) {
+      return res.status(400).json({ error: 'Utilizador não autenticado ou nenhum ficheiro enviado.' });
     }
     
+    // --- AFIRMAÇÃO DE TIPO (A Correção) ---
+    // A partir deste ponto, dizemos ao TypeScript que 'req' tem as nossas propriedades.
+    const authenticatedReq = req as Request & { user: { uid: string }, file: Express.Multer.File };
+
     try {
         const rawFileTypes = ['application/pdf'];
-        const resourceType = rawFileTypes.includes(req.file.mimetype) ? 'raw' : 'image';
-        const filename = `${path.parse(req.file.originalname).name}_${Date.now()}`;
+        // Usamos authenticatedReq a partir de agora
+        const resourceType = rawFileTypes.includes(authenticatedReq.file.mimetype) ? 'raw' : 'image';
+        const filename = `${path.parse(authenticatedReq.file.originalname).name}_${Date.now()}`;
 
         const uploadResponse = await new Promise((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
                 { 
-                    folder: `arrendasuacasa/${req.user.uid}`,
+                    folder: `arrendasuacasa/${authenticatedReq.user.uid}`,
                     resource_type: resourceType,
                     public_id: filename
                 },
@@ -41,7 +44,7 @@ router.post('/', checkAuth, upload.single('file'), async (req: Request, res: Res
                     resolve(result);
                 }
             );
-            uploadStream.end(req.file.buffer);
+            uploadStream.end(authenticatedReq.file.buffer);
         });
 
         const result = uploadResponse as any;
@@ -50,7 +53,7 @@ router.post('/', checkAuth, upload.single('file'), async (req: Request, res: Res
         if (resourceType === 'raw') {
             finalUrl = cloudinary.url(result.public_id, {
                 resource_type: 'raw',
-                flags: [`attachment:${req.file.originalname.replace(/\s+/g, '_')}`]
+                flags: [`attachment:${authenticatedReq.file.originalname.replace(/\s+/g, '_')}`]
             });
         }
         
