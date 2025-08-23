@@ -1,0 +1,23 @@
+/* src/index.css */
+
+@import "react-responsive-carousel/lib/styles/carousel.min.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos customizados para o carrossel de imóveis */
+.property-carousel .thumb {
+  border: 2px solid transparent;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+}
+
+.property-carousel .thumb.selected,
+.property-carousel .thumb:hover {
+  border-color: #1e66f5; /* A sua cor 'primary' */
+}
+
+.property-carousel .thumb img {
+  border-radius: 6px;
+}

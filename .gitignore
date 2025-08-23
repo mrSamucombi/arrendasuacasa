@@ -1,0 +1,56 @@
+# ========================================================================
+# Arquivos de Log e Dependências (Essenciais)
+# ========================================================================
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# A pasta mais importante a ignorar. Contém todas as dependências.
+node_modules/
+
+# ========================================================================
+# Arquivos de Build e Saída (Importantes para o Deploy)
+# ========================================================================
+# A pasta de build do Vite (frontend)
+dist/
+
+# A pasta de build do TypeScript (backend)
+# Se você tiver uma pasta 'dist' na raiz para o backend
+# dist/
+
+# Pasta de cache do Vite
+.vite/
+
+# ========================================================================
+# Arquivos Sensíveis e de Ambiente (CRUCIAIS PARA SEGURANÇA)
+# ========================================================================
+# NUNCA envie ficheiros .env para o Git
+.env
+.env.*
+!.env.example
+
+# Ficheiro da conta de serviço do Firebase
+firebase-service-account.json
+
+# Base de dados local do SQLite
+dev.db
+dev.db-journal
+
+# ========================================================================
+# Arquivos do Sistema Operacional e do Editor
+# ========================================================================
+.DS_Store
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+
+# ========================================================================
+# Arquivos de Cache de Testes e Cobertura
+# ========================================================================
+coverage/
+.nyc_output/

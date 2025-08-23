@@ -1,0 +1,5 @@
+{
+  "name": "ArrendaSuaCasa",
+  "description": "Uma plataforma para arrendamento de imóveis em Angola, conectando proprietários e inquilinos. Proprietários podem comprar moedas ASC para listar suas propriedades.",
+  "requestFramePermissions": []
+}

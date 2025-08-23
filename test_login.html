@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Teste de Login Firebase</title>
+</head>
+<body>
+    <h1>Teste de Login Direto no Firebase</h1>
+    
+    <input type="email" id="email" placeholder="Email" style="display: block; margin-bottom: 10px; padding: 8px; width: 300px;">
+    <input type="password" id="password" placeholder="Senha" style="display: block; margin-bottom: 10px; padding: 8px; width: 300px;">
+    <button id="loginButton">Fazer Login</button>
+
+    <div id="result" style="margin-top: 20px; font-family: monospace;"></div>
+
+    <!-- Importar o SDK do Firebase -->
+    <script type="module">
+        // Importar as funções necessárias
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+        // --- ATENÇÃO: COPIE E COLE AS SUAS CREDENCIAIS AQUI ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBAh9lE8hMlP7AVtXOTxDaPRyzA_EZTslg", // Substitua se for diferente
+            authDomain: "arrendasuacasaweb.firebaseapp.com",
+            projectId: "arrendasuacasaweb",
+            storageBucket: "arrendasuacasaweb.appspot.com",
+            messagingSenderId: "1096375371868",
+            appId: "1:1096375371868:web:3b26c20ad065cdad65be99"
+        };
+
+        // Inicializar o Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Lógica do botão
+        const loginButton = document.getElementById('loginButton');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const resultDiv = document.getElementById('result');
+
+        loginButton.addEventListener('click', async () => {
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            resultDiv.textContent = 'A tentar fazer login...';
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                console.log("Login bem-sucedido!", userCredential.user);
+                resultDiv.textContent = `SUCESSO! Logado como: ${userCredential.user.email} (UID: ${userCredential.user.uid})`;
+                resultDiv.style.color = 'green';
+            } catch (error) {
+                console.error("ERRO NO LOGIN:", error.code, error.message);
+                resultDiv.textContent = `FALHA! Código de erro: ${error.code}`;
+                resultDiv.style.color = 'red';
+            }
+        });
+    </script>
+</body>
+</html>

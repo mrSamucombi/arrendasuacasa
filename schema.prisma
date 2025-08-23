@@ -1,0 +1,174 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // Adicionar a configuração para a base de dados de produção
+  relationMode = "prisma" 
+}
+
+// --- Modelos Centrais ---
+
+enum UserRole {
+  ADMIN
+  OWNER
+  CLIENT
+}
+
+enum VerificationStatus {
+  NOT_VERIFIED
+  PENDING
+  VERIFIED
+}
+
+enum PurchaseStatus {
+  PENDING
+  CONFIRMED
+}
+
+enum PropertyStatus {
+  AVAILABLE   // Disponível
+  UNAVAILABLE // Indisponível (arquivado pelo proprietário)
+  RENTED      // Alugado (funcionalidade futura)
+}
+
+enum TransactionType {
+  PURCHASE   // Compra de moedas
+  PUBLISH    // Gasto para publicar um imóvel
+  REACTIVATE // Gasto para reativar um imóvel
+  ADMIN_CREDIT // Crédito manual por um admin
+}
+
+model Transaction {
+  id          String          @id @default(cuid())
+  userId      String          // ID do utilizador que realizou a transação
+  type        TransactionType // O tipo de transação
+  amount      Int             // O valor. Positivo para créditos, negativo para débitos (ex: -10)
+  description String          // Uma descrição clara, ex: "Publicação do imóvel 'Apartamento T3 na Mutamba'"
+  createdAt   DateTime        @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+
+model User {
+  id        String   @id
+  email     String   @unique
+  name      String
+  role      UserRole @default(CLIENT)
+  owner     Owner?
+  client    Client?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  conversations Conversation[] @relation("ConversationParticipants")
+  sentMessages  Message[]
+  transactions Transaction[]
+}
+
+model Owner {
+  id                      String             @id
+  user                    User               @relation(fields: [id], references: [id], onDelete: Cascade)
+  phoneNumber             String?
+  profilePictureUrl       String?
+  ascBalance              Int                @default(0)
+  verificationStatus      VerificationStatus @default(NOT_VERIFIED)
+  verificationDocumentUrl String?
+  verificationSelfieUrl   String?
+  properties              Property[]
+  purchases               Purchase[]
+}
+
+model Client {
+  id                  String     @id
+  user                User       @relation(fields: [id], references: [id], onDelete: Cascade)
+  profilePictureUrl   String?
+  favoriteProperties  Property[] @relation("Favorites")
+}
+
+// --- Modelos de Negócio ---
+
+model Property {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  address     String
+  price       Float
+  bedrooms    Int
+  bathrooms   Int
+  area        Float
+  
+  imageUrls   String   @default("")
+
+  owner       Owner    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId     String
+
+  favoritedBy Client[] @relation("Favorites")
+  status      PropertyStatus @default(AVAILABLE)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  conversations Conversation[]
+}
+
+model CoinPackage {
+  id          String     @id
+  description String
+  coins       Int
+  price       Float
+  purchases   Purchase[]
+}
+
+model Purchase {
+  id                String         @id @default(cuid())
+  proofOfPaymentUrl String
+  status            PurchaseStatus @default(PENDING)
+  owner             Owner          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId           String
+  pkg               CoinPackage    @relation(fields: [pkgId], references: [id])
+  pkgId             String
+  createdAt         DateTime       @default(now())
+  confirmedAt       DateTime?
+}
+
+model Conversation {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relação com o Imóvel
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId String
+
+  // Relação com os Participantes
+  participants User[] @relation("ConversationParticipants")
+  
+  // Relação com as Mensagens
+  messages Message[]
+
+  @@index([propertyId])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  
+  text      String
+
+  // Relação com a Conversa
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversationId String
+  isRead    Boolean  @default(false)
+  // Relação com o Remetente
+  sender   User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  senderId String
+
+  @@index([conversationId])
+  @@index([senderId])
+}
