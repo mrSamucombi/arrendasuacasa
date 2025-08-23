@@ -6,6 +6,7 @@ import cloudinary from '../lib/cloudinary.js';
 import { checkAuth } from '../middleware/auth.middleware.js';
 import path from 'path';
 
+
 const router = Router();
 
 const storage = multer.memoryStorage();
@@ -15,6 +16,7 @@ const upload = multer({
 });
 
 router.post('/', checkAuth, upload.single('file'), async (req: Request, res: Response) => {
+    
     if (!req.user) {
         return res.status(401).json({ error: 'Não autorizado.' });
     }
