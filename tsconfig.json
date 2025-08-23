@@ -11,7 +11,7 @@
     "forceConsistentCasingInFileNames": true,
 
     // --- OPÇÕES PARA O BACKEND ---
-    "outDir": "./dist-server", // Onde os ficheiros compilados .js serão colocados
+    //"outDir": "./dist-server", // Onde os ficheiros compilados .js serão colocados
     "rootDir": ".",     // A raiz do projeto
     "sourceMap": true,  // Gera source maps para facilitar a depuração
     

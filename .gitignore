@@ -54,3 +54,10 @@ dev.db-journal
 # ========================================================================
 coverage/
 .nyc_output/
+
+# Ignorar ficheiros JavaScript compilados na pasta fonte
+*.js
+*.js.map
+!vite.config.js
+!postcss.config.cjs
+!tailwind.config.js
