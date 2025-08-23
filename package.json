@@ -5,14 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build:css": "npx tailwindcss -i ./src/index.css -o ./src/tailwind-output.css",
-    "build:frontend": "npm run build:css && vite build",
-    "preview:frontend": "vite preview",
-    "build:backend": "npx prisma generate && tsc",
-    "start": "npm run start:backend",
-    "build": "npm install && npm run build:backend && npm run build:frontend",
-    "start:backend": "node server.js",
-    "prisma:generate": "prisma generate",
+    "start": "node server.js",
+    "build": "npx prisma generate && tsc && npx tailwindcss -i ./src/index.css -o ./src/tailwind-output.css && vite build",
     "prisma:migrate": "prisma migrate dev",
     "postinstall": "prisma generate"
   },
