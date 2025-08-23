@@ -46,3 +46,4 @@ export default defineConfig({
     sourcemap: true, // Gera sourcemaps para facilitar a depuração em produção
   },
 });
+// Forçar deploy
