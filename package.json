@@ -8,9 +8,9 @@
     "build:frontend": "vite build",
     "preview:frontend": "vite preview",
     "build:backend": "npx prisma generate && tsc",
-    "start:backend": "node dist/server.js",
-    "build": "npm install && npm run build:backend && npm run build:frontend",
     "start": "npm run start:backend",
+    "build": "npm install && npm run build:backend && npm run build:frontend",
+    "start:backend": "node dist-server/server.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "postinstall": "prisma generate"
