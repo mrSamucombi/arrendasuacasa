@@ -1,30 +1,13 @@
-// api/properties.routes.ts (VERSÃO COMPLETA E FINAL)
+// api/properties.routes.ts
 
 import { Router, Request, Response } from 'express';
 import { prisma } from '../lib/prisma.js';
 import { checkAuth, checkPropertyOwnership } from '../middleware/auth.middleware.js';
 import { UserRole, PropertyStatus } from '@prisma/client';
+import { createPropertySchema } from '../lib/schemas.js';
 import { z } from 'zod';
 
 const router = Router();
-
-// ========================================================================
-// Schema de Validação com Zod (CORRIGIDO)
-// ========================================================================
-const createPropertySchema = z.object({
-  title: z.string().min(10, { message: "O título deve ter pelo menos 10 caracteres." }),
-  address: z.string().min(10, { message: "O endereço deve ter pelo menos 10 caracteres." }),
-  description: z.string().min(1, { message: "A descrição é obrigatória." }),
-  price: z.coerce.number({ required_error: "O preço é obrigatório.", invalid_type_error: "O preço deve ser um número válido." }).positive(),
-  bedrooms: z.coerce.number({ required_error: "O número de quartos é obrigatório.", invalid_type_error: "O número de quartos deve ser um número." }).int().min(0),
-  bathrooms: z.coerce.number({ required_error: "O número de WCs é obrigatório.", invalid_type_error: "O número de WCs deve ser um número." }).int().min(0),
-  area: z.coerce.number({ required_error: "A área é obrigatória.", invalid_type_error: "A área deve ser um número válido." }).positive(),
-  imageUrls: z.string().min(1, { message: "Pelo menos uma imagem é necessária." }),
-});
-
-// ========================================================================
-// ROTAS DA API
-// ========================================================================
 
 // --- ROTA DE CRIAÇÃO DE IMÓVEL ---
 router.post('/', checkAuth, async (req: Request, res: Response) => {
@@ -35,18 +18,28 @@ router.post('/', checkAuth, async (req: Request, res: Response) => {
     try {
         const validatedData = createPropertySchema.parse(req.body);
         const owner = await prisma.owner.findUnique({ where: { id: ownerId }, include: { user: true }});
-        if (!owner || owner.user.role !== UserRole.OWNER) return res.status(403).json({ error: 'Apenas proprietários podem publicar imóveis.' });
-        if (owner.ascBalance < PUBLISH_COST) return res.status(403).json({ error: 'Saldo de moedas ASC insuficiente para publicar.' });
+
+        if (!owner || owner.user.role !== UserRole.OWNER) {
+            return res.status(403).json({ error: 'Apenas proprietários podem publicar imóveis.' });
+        }
+        if (owner.ascBalance < PUBLISH_COST) {
+            return res.status(403).json({ error: 'Saldo de moedas ASC insuficiente para publicar.' });
+        }
 
         const newProperty = await prisma.$transaction(async (tx) => {
             await tx.owner.update({ where: { id: ownerId }, data: { ascBalance: { decrement: PUBLISH_COST } } });
-            const property = await tx.property.create({ data: { ...validatedData, owner: { connect: { id: ownerId } } }});
+            const property = await tx.property.create({ 
+                data: { 
+                    ...validatedData,
+                    owner: { connect: { id: ownerId } }
+                }
+            });
             await tx.transaction.create({ data: { userId: ownerId, type: 'PUBLISH', amount: -PUBLISH_COST, description: `Publicação do imóvel: ${property.title}` }});
             return property;
         });
         res.status(201).json(newProperty);
     } catch (error) {
-        if (error instanceof z.ZodError) return res.status(400).json({ error: "Dados inválidos.", details: error.flatten().fieldErrors });
+        if (error instanceof z.ZodError) { return res.status(400).json({ error: "Dados inválidos.", details: error.flatten().fieldErrors }); }
         console.error("ERRO ao criar imóvel:", error);
         res.status(500).json({ error: 'Falha ao criar o imóvel.' });
     }

@@ -12,15 +12,6 @@ const storage = multer.memoryStorage();
 const upload = multer({ 
   storage: storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // Limite de 10 MB
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|pdf/;
-    const mimetype = allowedTypes.test(file.mimetype);
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    if (mimetype && extname) {
-      return cb(null, true);
-    }
-    cb(new Error('Tipo de ficheiro não suportado.'));
-  }
 });
 
 router.post('/', checkAuth, upload.single('file'), async (req: Request, res: Response) => {

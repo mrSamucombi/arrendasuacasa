@@ -15,8 +15,8 @@ router.get('/', checkAuth, async (req: Request, res: Response) => {
 
     try {
         const purchases = await prisma.purchase.findMany({
-            where: { ownerId: ownerId }, // Usa 'ownerId' como no schema.prisma
-            include: { pkg: true }, // Usa 'pkg' como no schema.prisma
+            where: { ownerId: ownerId },
+            include: { pkg: true },
             orderBy: { createdAt: 'desc' }
         });
         res.status(200).json(purchases);
@@ -32,15 +32,16 @@ router.post('/', checkAuth, async (req: Request, res: Response) => {
     const ownerId = req.user.uid;
     
     try {
-        const { pkgId, proofOfPayment } = initiatePurchaseSchema.parse(req.body);
+        // Usa o schema simplificado que agora espera 'proofOfPaymentUrl'
+        const { pkgId, proofOfPaymentUrl } = initiatePurchaseSchema.parse(req.body);
 
         const newPurchase = await prisma.purchase.create({
             data: { 
                 ownerId: ownerId, 
                 pkgId: pkgId, 
-                proofOfPayment: proofOfPayment, // Usa 'proofOfPayment' como no schema.prisma
+                proofOfPaymentUrl: proofOfPaymentUrl, // Usa o nome de campo correto
             },
-            include: { pkg: true } // Usa 'pkg' como no schema.prisma
+            include: { pkg: true }
         });
         res.status(201).json(newPurchase);
 
