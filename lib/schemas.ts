@@ -15,20 +15,9 @@ export const sendMessageSchema = z.object({
   text: z.string(),
 });
 
-export const createPropertySchema = z.object({
-  title: z.string().min(1, "O título é obrigatório."),
-  address: z.string().min(1, "O endereço é obrigatório."),
-  description: z.string().min(1, "A descrição é obrigatória."),
-  price: z.coerce.number(),
-  bedrooms: z.coerce.number(),
-  bathrooms: z.coerce.number(),
-  area: z.coerce.number(),
-  imageUrls: z.string().min(1, "Pelo menos uma imagem é necessária."),
-});
 
 // Exportação para o frontend
 export const propertyFormSchema = createPropertySchema; 
-export const profileFormSchema = updateUserProfileSchema.pick({ name: true, phoneNumber: true }).extend({ profilePicture: z.any().optional() });
 
 export const initiatePurchaseSchema = z.object({
   pkgId: z.string(),
