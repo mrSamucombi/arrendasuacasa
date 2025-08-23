@@ -5,7 +5,6 @@
   "type": "module",
     
   "scripts": {
-    //ok
     "dev": "vite",
     "build:frontend": "npx tailwindcss -i ./src/index.css -o ./src/tailwind-output.css && vite build",
     "build:backend": "npx prisma generate && tsc",
