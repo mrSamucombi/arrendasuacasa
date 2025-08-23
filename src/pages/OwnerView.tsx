@@ -8,7 +8,7 @@ import PurchaseModal from '../components/PurchaseModal';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 // CORREÇÃO AQUI
-import { propertyFormSchema } from '../../lib/schemas'; 
+import { propertyFormSchema } from '../schemas/formSchemas'; 
 import { z } from 'zod';
 import { toast } from 'react-hot-toast';
 
