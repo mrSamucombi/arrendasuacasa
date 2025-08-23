@@ -3,12 +3,12 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+    
   "scripts": {
     "dev": "vite",
-    "start": "node server.js",
-    "build": "npx prisma generate && tsc && npx tailwindcss -i ./src/index.css -o ./src/tailwind-output.css && vite build",
-    "prisma:migrate": "prisma migrate dev",
-    "postinstall": "prisma generate"
+    "build:frontend": "npx tailwindcss -i ./src/index.css -o ./src/tailwind-output.css && vite build",
+    "build:backend": "npx prisma generate && tsc",
+    "start:backend": "node dist/server.js"
   },
 
   "prisma": {
