@@ -11,12 +11,12 @@ const router = Router();
 // Rota para um utilizador buscar o SEU PRÓPRIO histórico de compras
 router.get('/', checkAuth, async (req: Request, res: Response) => {
     if (!req.user) return res.status(401).json({ error: 'Não autorizado' });
-    const ownerId = req.user.uid; // O ID do utilizador logado é o ownerId
+    const ownerId = req.user.uid;
 
     try {
         const purchases = await prisma.purchase.findMany({
-            where: { ownerId: ownerId }, // <-- CORRIGIDO para ownerId
-            include: { pkg: true }, // <-- CORRIGIDO para pkg
+            where: { ownerId: ownerId }, // Usa 'ownerId' como no schema.prisma
+            include: { pkg: true }, // Usa 'pkg' como no schema.prisma
             orderBy: { createdAt: 'desc' }
         });
         res.status(200).json(purchases);
@@ -36,11 +36,11 @@ router.post('/', checkAuth, async (req: Request, res: Response) => {
 
         const newPurchase = await prisma.purchase.create({
             data: { 
-                ownerId: ownerId, // <-- CORRIGIDO para ownerId
+                ownerId: ownerId, 
                 pkgId: pkgId, 
-                proofOfPaymentUrl: proofOfPayment, // O seu schema tem 'proofOfPayment', vamos assumir que quis dizer proofOfPaymentUrl
+                proofOfPayment: proofOfPayment, // Usa 'proofOfPayment' como no schema.prisma
             },
-            include: { pkg: true } // <-- CORRIGIDO para pkg
+            include: { pkg: true } // Usa 'pkg' como no schema.prisma
         });
         res.status(201).json(newPurchase);
 
