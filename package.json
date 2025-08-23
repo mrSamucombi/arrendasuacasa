@@ -16,7 +16,7 @@
     "prisma:migrate": "prisma migrate dev",
     "postinstall": "prisma generate"
   },
-},
+
   "prisma": {
     "seed": "tsx watch prisma/seed.ts"
   },
@@ -42,6 +42,7 @@
     "react-responsive-carousel": "^3.2.23",
     "zod": "^4.1.0"
   },
+
   "devDependencies": {
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/forms": "^0.5.10",
