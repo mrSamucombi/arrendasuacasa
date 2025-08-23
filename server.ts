@@ -4,6 +4,16 @@ import dotenv from 'dotenv';
 // Garante que as variáveis de ambiente são lidas ANTES de qualquer outra coisa
 dotenv.config(); 
 
+// --- BLOCO DE DEPURAÇÃO DE VARIÁVEIS DE AMBIENTE ---
+console.log("--- A VERIFICAR VARIÁVEIS DE AMBIENTE NO RENDER ---");
+console.log("DATABASE_URL existe?", !!process.env.DATABASE_URL);
+console.log("CLOUDINARY_CLOUD_NAME existe?", !!process.env.CLOUDINARY_CLOUD_NAME);
+console.log("FIREBASE_PROJECT_ID existe?", !!process.env.FIREBASE_PROJECT_ID);
+console.log("FIREBASE_CLIENT_EMAIL existe?", !!process.env.FIREBASE_CLIENT_EMAIL);
+console.log("FIREBASE_PRIVATE_KEY existe?", !!process.env.FIREBASE_PRIVATE_KEY);
+console.log("---------------------------------------------------");
+// --- FIM DO BLOCO DE DEPURAÇÃO ---
+
 import express from 'express';
 import cors from 'cors';
 import { generalApiLimiter } from './src/config/rateLimiter.js'; // Verifique o caminho
