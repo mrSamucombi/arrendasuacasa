@@ -26,19 +26,33 @@ router.post('/', checkAuth, async (req: Request, res: Response) => {
             return res.status(403).json({ error: 'Saldo de moedas ASC insuficiente para publicar.' });
         }
 
-        const newProperty = await prisma.$transaction(async (tx) => {
-            await tx.owner.update({ where: { id: ownerId }, data: { ascBalance: { decrement: PUBLISH_COST } } });
+        const { newProperty, updatedOwner } = await prisma.$transaction(async (tx) => {
+            const ownerAfterUpdate = await tx.owner.update({ 
+                where: { id: ownerId }, 
+                data: { ascBalance: { decrement: PUBLISH_COST } } 
+            });
+
             const property = await tx.property.create({ 
                 data: { 
-                    ...validatedData,
-                    owner: { connect: { id: ownerId } }
+                ...validatedData,
+                owner: { connect: { id: ownerId } }
                 }
             });
-            await tx.transaction.create({ data: { userId: ownerId, type: 'PUBLISH', amount: -PUBLISH_COST, description: `Publicação do imóvel: ${property.title}` }});
-            return property;
-        });
-        res.status(201).json(newProperty);
-    } catch (error) {
+
+            await tx.transaction.create({ 
+                data: { 
+                userId: ownerId, 
+                type: 'PUBLISH', 
+                amount: -PUBLISH_COST, 
+                description: `Publicação do imóvel: ${property.title}` 
+                }
+            });
+
+        return { newProperty: property, updatedOwner: ownerAfterUpdate };
+    });
+
+    res.status(201).json({ newProperty, updatedOwner });
+        } catch (error) {
         if (error instanceof z.ZodError) { return res.status(400).json({ error: "Dados inválidos.", details: error.flatten().fieldErrors }); }
         console.error("ERRO ao criar imóvel:", error);
         res.status(500).json({ error: 'Falha ao criar o imóvel.' });

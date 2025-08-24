@@ -165,15 +165,28 @@ function App() {
   };
 
   const handleAddProperty = async (propertyData, images) => {
-    const promise = apiService.addProperty(propertyData, images).then((newProperty) => {
-      setProperties(prev => ({ ...prev, data: [newProperty, ...prev.data] }));
-      setCurrentUser(prevUser => {
-        if (!prevUser || !('ascBalance' in prevUser.user)) return prevUser;
-        const updatedOwner = { ...prevUser.user, ascBalance: prevUser.user.ascBalance - 10 };
-        return { ...prevUser, user: updatedOwner };
-      });
-    });
-    toast.promise(promise, { loading: 'A publicar...', success: 'Imóvel publicado!', error: (err) => `Falha: ${err.message}` });
+    const promise = apiService.addProperty(propertyData, images).then((response) => {
+    // Agora `response` é o objeto { newProperty, updatedOwner }
+    const { newProperty, updatedOwner } = response;
+
+    // Validação para garantir que a API retornou o que esperamos
+    if (!newProperty || !updatedOwner) {
+      throw new Error("A resposta da API está incompleta.");
+    }
+
+    // Atualiza a lista de imóveis com o novo imóvel
+    setProperties(prev => ({ ...prev, data: [newProperty, ...prev.data] }));
+
+    // Atualiza o usuário com os dados FRESCOS vindos diretamente do backend
+    setCurrentUser({ user: updatedOwner, role: UserRole.Owner });
+  });
+
+  // O toast.promise vai funcionar perfeitamente agora
+  toast.promise(promise, {
+    loading: 'A publicar o seu imóvel...',
+    success: 'Imóvel publicado com sucesso!',
+    error: (err) => `Falha ao publicar: ${err.message}`,
+  });
   };
   
   const handleToggleFavorite = async (propertyId: string) => {
