@@ -17,37 +17,29 @@ router.get('/', checkAuth, async (req: Request, res: Response) => {
     const userId = req.user.uid;
 
     try {
-        // 1. Buscamos o registro do usuário para descobrir o seu 'role'
-        const user = await prisma.user.findUnique({
-            where: { id: userId }
+        // Primeiro, tentamos encontrar um registro de 'Owner' com o ID do usuário.
+        const ownerProfile = await prisma.owner.findUnique({
+            where: { id: userId },
         });
 
-        if (!user) {
-            return res.status(404).json({ error: 'Utilizador não encontrado.' });
-        }
-
-        // 2. Lógica Condicional baseada no 'role'
-        if (user.role === UserRole.OWNER) {
-            // Se for um Proprietário, busca as compras ligadas ao 'ownerId'
+        // Se encontrarmos um perfil de proprietário, significa que o usuário é um OWNER.
+        if (ownerProfile) {
+            // Agora podemos fazer a query com segurança.
             const purchases = await prisma.purchase.findMany({
                 where: { ownerId: userId },
                 orderBy: { createdAt: 'desc' },
                 include: { pkg: true },
             });
             return res.status(200).json(purchases);
-
-        } else if (user.role === UserRole.CLIENT) {
-            // Se for um Cliente, ele não tem compras de moedas.
-            // Retornamos um array vazio para que o frontend não quebre.
-            return res.status(200).json([]);
-
         } else {
-            // Se for um Admin ou outro role, pode ter uma lógica diferente
+            // Se não encontrarmos um perfil de proprietário, o usuário é um Cliente
+            // ou um Admin. Em ambos os casos, eles não têm compras de moedas.
+            // Retornamos um array vazio para que o frontend não quebre.
             return res.status(200).json([]);
         }
 
     } catch (error) {
-        console.error("ERRO ao buscar o histórico de compras:", error);
+        console.error("ERRO CRÍTICO ao buscar o histórico de compras:", error);
         res.status(500).json({ error: 'Falha ao obter o histórico de compras.' });
     }
 });
