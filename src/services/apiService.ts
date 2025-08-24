@@ -200,6 +200,18 @@ export async function updateMyProfile(data: ProfileUpdateData): Promise<Authenti
   return handleResponse(response);
 }
 
+export async function getOwnerDashboardData() {
+  // Usamos Promise.all para fazer as chamadas em paralelo, o que é mais rápido.
+  const [profile, properties, purchases] = await Promise.all([
+    getMyProfile(), // Você já tem esta função
+    // Crie uma função getMyProperties se não tiver
+    // Ou adapte a getProperties para buscar apenas os do usuário logado
+    getProperties(), // Adapte se necessário
+    getClientPurchases() // Você já tem esta função
+  ]);
+
+  return { profile, properties, purchases };
+}
 
 // --- Rotas de Administrador ---
 export async function getUsersToVerify(): Promise<Owner[]> {
