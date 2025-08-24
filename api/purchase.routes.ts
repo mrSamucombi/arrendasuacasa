@@ -26,31 +26,33 @@ router.get('/', checkAuth, async (req, res) => { // <-- Adicionado checkAuth
     }
 });
 
-// Rota para um Proprietário criar um novo pedido de compra
-router.post('/', checkAuth, async (req: Request, res: Response) => {
-    if (!req.user) return res.status(401).json({ error: 'Não autorizado' });
-    const ownerId = req.user.uid;
-    
+// Rota para um Proprietário criar um novo pedido de comprarouter.post('/', checkAuth, async (req: Request, res: Response) => {
+    if (!req.user) {
+        return res.status(401).json({ error: 'Não autorizado' });
+    }
+
+    // --- A LINHA DE CORREÇÃO ESTÁ AQUI ---
+    const ownerId = req.user.uid; // Define ownerId a partir do token do Firebase
+
     try {
-        // Usa o schema simplificado que agora espera 'proofOfPaymentUrl'
-        const { pkgId, proofOfPaymentUrl } = initiatePurchaseSchema.parse(req.body);
+        const validatedData = initiatePurchaseSchema.parse(req.body);
 
+        // Agora 'ownerId' existe e o código funciona
         const newPurchase = await prisma.purchase.create({
-            data: { 
-                ownerId: ownerId, 
-                pkgId: pkgId, 
-                proofOfPaymentUrl: proofOfPaymentUrl, // Usa o nome de campo correto
-            },
-            include: { pkg: true }
+            data: {
+                ownerId: ownerId, // CORRETO
+                pkgId: validatedData.pkgId,
+                proofOfPayment: validatedData.proofOfPaymentUrl,
+            }
         });
+        
         res.status(201).json(newPurchase);
-
     } catch (error) {
         if (error instanceof z.ZodError) {
             return res.status(400).json({ error: "Dados inválidos.", details: error.flatten().fieldErrors });
         }
-        console.error("Erro ao iniciar compra:", error);
-        res.status(500).json({ error: 'Falha ao iniciar compra.' });
+        console.error("ERRO ao criar a compra:", error);
+        res.status(500).json({ error: 'Falha ao processar a sua compra.' });
     }
 });
 
