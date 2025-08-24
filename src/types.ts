@@ -38,7 +38,7 @@ export interface Purchase {
   id: string;
   ownerId: string;
   pkgId: string;
-  proofOfPayment: string;
+  proofOfPaymentUrl: string;
   status: PurchaseStatus;
   createdAt: Date;
   confirmedAt?: Date | null;

@@ -34,12 +34,11 @@ router.post('/', checkAuth, async (req: Request, res: Response) => {
 
     try {
         const validatedData = initiatePurchaseSchema.parse(req.body);
-
         const newPurchase = await prisma.purchase.create({
             data: {
                 ownerId: ownerId,
                 pkgId: validatedData.pkgId,
-                proofOfPayment: validatedData.proofOfPayment, // Deve receber a URL
+                proofOfPaymentUrl: validatedData.proofOfPaymentUrl, // <-- CORRIGIDO
                 status: PurchaseStatus.PENDING,
             },
             include: { pkg: true },

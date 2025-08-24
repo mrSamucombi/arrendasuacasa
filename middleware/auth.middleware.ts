@@ -2,6 +2,7 @@
 import { auth as firebaseAuth } from '../lib/firebaseAdmin.js';
 import { prisma } from '../lib/prisma.js';
 import { Request, Response, NextFunction } from 'express';
+import { UserRole } from '@prisma/client';
 
 export const checkPropertyOwnership = async (req: Request, res: Response, next: NextFunction) => { 
   console.log("\n--- Middleware 'checkPropertyOwnership' ATIVADO ---");
@@ -57,6 +58,29 @@ export const checkPropertyOwnership = async (req: Request, res: Response, next: 
 };
 
 
+// --- NOVA FUNÇÃO checkRole ---
+export const checkRole = (requiredRole: UserRole) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Não autenticado.' });
+    }
+
+    try {
+      const userRecord = await prisma.user.findUnique({
+        where: { id: req.user.uid },
+      });
+
+      if (!userRecord || userRecord.role !== requiredRole) {
+        return res.status(403).json({ error: 'Acesso negado. Permissões insuficientes.' });
+      }
+
+      next();
+    } catch (error) {
+      console.error("Erro ao verificar a permissão do utilizador:", error);
+      return res.status(500).json({ error: 'Erro interno ao verificar permissões.' });
+    }
+  };
+};
 
 export const checkAuth = async (req: Request, res: Response, next: NextFunction) => {
   console.log("\n--- Middleware 'checkAuth' ATIVADO ---");
