@@ -176,8 +176,12 @@ const OwnerView: React.FC<OwnerViewProps> = ({ owner, properties, purchases, onA
   const [selectedPackage, setSelectedPackage] = useState<CoinPackage | null>(null);
 
   const myProperties = useMemo(() => {
+  // Se 'owner' não existir, retorna um array vazio.
+    if (!owner) {
+        return [];
+     }
     return (properties || []).filter(property => property.ownerId === owner.id);
-  }, [properties, owner.id]);
+    }, [properties, owner]); // <-- Mude a dependência para 'owner' em vez de 'owner.id'
 
   const handleSelectPackage = (pkg: CoinPackage) => {
     setSelectedPackage(pkg);

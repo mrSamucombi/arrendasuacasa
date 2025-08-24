@@ -233,7 +233,25 @@ function App() {
         return <ChatView currentUser={currentUser} initialPropertyId={initialChatPropertyId} />;
       default: // 'main'
         if (role === UserRole.Admin) return <AdminView stats={adminStats} usersToVerify={usersToVerify} purchases={purchases} onConfirmVerification={handleConfirmVerification} onConfirmPurchase={handleConfirmPurchase} onRefreshData={fetchData}/>;
-        if (role === UserRole.Owner) return <OwnerView owner={currentUser.user as Owner} properties={properties.data} purchases={purchases} onAddProperty={handleAddProperty} onInitiatePurchase={handleInitiatePurchase} onInitiateVerification={handleInitiateVerification} onSelectProperty={handleSelectProperty} onDeactivate={handleDeactivateProperty} onReactivate={handleReactivateProperty} />;
+        
+        if (role === UserRole.Owner) {
+          // Adiciona uma verificação extra para garantir que os dados do usuário existem
+          if (!currentUser.user) return <LoadingSpinner />; // Ou null
+
+          return (
+            <OwnerView
+              owner={currentUser.user as Owner}
+              properties={properties.data}
+              purchases={purchases}
+              onAddProperty={handleAddProperty}
+              onInitiatePurchase={handleInitiatePurchase}
+              onInitiateVerification={handleInitiateVerification}
+              onSelectProperty={handleSelectProperty}
+              onDeactivate={handleDeactivateProperty}
+              onReactivate={handleReactivateProperty}
+            />
+          );
+        }
         if (role === UserRole.Client) return <ClientView client={currentUser.user as Client} properties={properties} purchases={purchases} onToggleFavorite={handleToggleFavorite} onSelectProperty={handleSelectProperty} onPageChange={handlePageChange} onFilterChange={handleFilterChange} currentFilters={filters} />;
         return null;
     }
