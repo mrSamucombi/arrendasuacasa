@@ -1,35 +1,23 @@
 {
   "compilerOptions": {
-    // --- OPÇÕES PRINCIPAIS ---
-    "target": "ES2022", // Alvo moderno para Node.js
-    "module": "NodeNext", // Módulo correto para ES Modules em Node.js
+    "target": "ES2020",
+    "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "lib": ["ES2022"],
-    "strict": true, // Ativa todas as verificações estritas de tipo
-    "esModuleInterop": true, // Permite compatibilidade entre CommonJS e ES Modules
-    "skipLibCheck": true, // Pula a verificação de tipos em ficheiros de declaração (.d.ts)
-    "forceConsistentCasingInFileNames": true,
-
-    // --- OPÇÕES PARA O BACKEND ---
-    "outDir": "./dist-server", // Onde os ficheiros compilados .js serão colocados
-    "rootDir": "./src",     // A raiz do projeto
-    "sourceMap": true,  // Gera source maps para facilitar a depuração
-    
-    // --- OPÇÕES PARA O VITE/REACT (que queremos que o backend ignore) ---
-    "jsx": "react-jsx" // Embora o backend não use, tê-lo aqui pode ajudar o editor, mas o 'exclude' é o mais importante.
+    "outDir": "./dist",
+    "rootDir": ".",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
-  
-  // --- CONTROLO DE FICHEIROS (A PARTE MAIS IMPORTANTE) ---
   "include": [
-    "server.ts", // Inclui o seu ficheiro de servidor principal
-    "api/**/*.ts", // Inclui todos os ficheiros .ts dentro da pasta 'api'
-    "lib/**/*.ts", // Inclui todos os ficheiros .ts dentro da pasta 'lib'
-    "middleware/**/*.ts", // Inclui todos os ficheiros .ts dentro da pasta 'middleware'
-    "types/**/*.ts"
+    "server.ts",
+    "api/**/*.ts",
+    "lib/**/*.ts",
+    "middleware/**/*.ts"
   ],
   "exclude": [
-    "node_modules", // Sempre exclua node_modules
-    "src", // <-- A CORREÇÃO: Exclui completamente a pasta do frontend da compilação do backend
-    "vite.config.ts" // Exclui o ficheiro de configuração do Vite
+    "node_modules",
+    "src"
   ]
 }
