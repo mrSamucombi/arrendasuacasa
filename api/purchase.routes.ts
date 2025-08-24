@@ -9,9 +9,9 @@ import { z } from 'zod';
 const router = Router();
 
 // Rota para um utilizador buscar o SEU PRÓPRIO histórico de compras
-router.get('/', checkAuth, async (req: Request, res: Response) => {
-    if (!req.user) return res.status(401).json({ error: 'Não autorizado' });
-    const ownerId = req.user.uid;
+router.get('/', checkAuth, async (req, res) => { // <-- Adicionado checkAuth
+  if (!req.user) return res.status(401).json({ error: "Não autorizado" });
+  const userId = req.user.uid;
 
     try {
         const purchases = await prisma.purchase.findMany({
