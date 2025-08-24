@@ -27,7 +27,7 @@ router.get('/', checkAuth, async (req: Request, res: Response) => {
         }
 
         // 2. Lógica Condicional baseada no 'role'
-        if (user.role === UserRole.Owner) {
+        if (user.role === UserRole.OWNER) {
             // Se for um Proprietário, busca as compras ligadas ao 'ownerId'
             const purchases = await prisma.purchase.findMany({
                 where: { ownerId: userId },
@@ -36,7 +36,7 @@ router.get('/', checkAuth, async (req: Request, res: Response) => {
             });
             return res.status(200).json(purchases);
 
-        } else if (user.role === UserRole.Client) {
+        } else if (user.role === UserRole.CLIENT) {
             // Se for um Cliente, ele não tem compras de moedas.
             // Retornamos um array vazio para que o frontend não quebre.
             return res.status(200).json([]);
