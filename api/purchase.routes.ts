@@ -11,16 +11,41 @@ const router = Router();
 
 // ROTA GET: Obter o histórico de compras do utilizador logado
 router.get('/', checkAuth, async (req: Request, res: Response) => {
-    if (!req.user) return res.status(401).json({ error: 'Não autorizado' });
+    if (!req.user) {
+        return res.status(401).json({ error: 'Não autorizado' });
+    }
     const userId = req.user.uid;
 
     try {
-        const purchases = await prisma.purchase.findMany({
-            where: { ownerId: userId },
-            orderBy: { createdAt: 'desc' },
-            include: { pkg: true },
+        // 1. Buscamos o registro do usuário para descobrir o seu 'role'
+        const user = await prisma.user.findUnique({
+            where: { id: userId }
         });
-        res.status(200).json(purchases);
+
+        if (!user) {
+            return res.status(404).json({ error: 'Utilizador não encontrado.' });
+        }
+
+        // 2. Lógica Condicional baseada no 'role'
+        if (user.role === UserRole.Owner) {
+            // Se for um Proprietário, busca as compras ligadas ao 'ownerId'
+            const purchases = await prisma.purchase.findMany({
+                where: { ownerId: userId },
+                orderBy: { createdAt: 'desc' },
+                include: { pkg: true },
+            });
+            return res.status(200).json(purchases);
+
+        } else if (user.role === UserRole.Client) {
+            // Se for um Cliente, ele não tem compras de moedas.
+            // Retornamos um array vazio para que o frontend não quebre.
+            return res.status(200).json([]);
+
+        } else {
+            // Se for um Admin ou outro role, pode ter uma lógica diferente
+            return res.status(200).json([]);
+        }
+
     } catch (error) {
         console.error("ERRO ao buscar o histórico de compras:", error);
         res.status(500).json({ error: 'Falha ao obter o histórico de compras.' });
