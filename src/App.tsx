@@ -1,3 +1,5 @@
+// App.tsx (VERSÃO COMPLETA, FINAL E CORRIGIDA)
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { UserRole, AuthenticatedUser, Owner, Client, Property, Purchase, CoinPackage } from './types';
 import Navbar from '../src/components/Navbar';
@@ -50,7 +52,7 @@ function App() {
       try {
         if (firebaseUser) {
           const userProfile = await apiService.getMyProfile();
-          if (!userProfile || !userProfile.id || !userProfile.role) {
+          if (!userProfile || !userProfile.user || !userProfile.role) {
             throw new Error('Perfil inválido ou não encontrado na base de dados.');
           }
           setCurrentUser(userProfile);
@@ -97,7 +99,6 @@ function App() {
       } else {
         setPurchases(rest[0] || []);
       }
-
     } catch (error) {
       toast.error(`Não foi possível carregar os dados: ${(error as Error).message}`);
     } finally {
@@ -112,14 +113,14 @@ function App() {
   }, [isAuthLoading, currentUser, fetchData]);
   
   const hasUnreadMessages = useMemo(() => {
-    if (!currentUser) return false;
-    // Verifica se o currentUser tem um ID antes de comparar
-    const currentUserId = currentUser.id;
+    if (!currentUser?.user) return false;
+    const currentUserId = currentUser.user.id;
     return conversations.some(convo => convo.messages?.some(msg => !msg.isRead && msg.senderId !== currentUserId));
   }, [conversations, currentUser]);
   
   // --- HANDLERS DE EVENTOS ---
 
+  const handleLoginSuccess = useCallback((userData: AuthenticatedUser) => { setCurrentUser(userData); }, []);
   const handleLogout = useCallback(async () => { await signOut(auth); }, []);
   const handleAdminLogout = useCallback(() => setIsAdminMode(false), []);
   const handlePageChange = (newPage: number) => { if (newPage > 0 && newPage <= properties.pagination.totalPages) setCurrentPage(newPage); };
@@ -148,8 +149,8 @@ function App() {
   };
 
   const handleInitiateVerification = async (data: { documentFile: File; selfieFile: File; email: string; phone: string; }) => {
-    if (!currentUser) return;
-    const promise = apiService.initiateVerification(currentUser.id, data).then((updatedOwner) => {
+    if (!currentUser?.user) return;
+    const promise = apiService.initiateVerification(currentUser.user.id, data).then((updatedOwner) => {
       setCurrentUser({ user: updatedOwner, role: UserRole.Owner });
       setActiveView('main');
     });
@@ -171,13 +172,11 @@ function App() {
   const handleToggleFavorite = async (propertyId: string) => {
     if (!currentUser) return;
     try {
-      // Otimista: atualiza a UI primeiro
       const updatedUser = await apiService.toggleFavorite(propertyId);
       setCurrentUser({ user: updatedUser, role: UserRole.Client });
       toast.success("Favoritos atualizados!");
     } catch (error) {
       toast.error(`Falha ao atualizar favoritos.`);
-      // Reverte a UI se a API falhar
       fetchData();
     }
   };
@@ -216,7 +215,7 @@ function App() {
     }
 
     const role = isAdminMode ? UserRole.Admin : currentUser?.role;
-    if (!currentUser) return null;
+    if (!currentUser || !currentUser.user) return null;
 
     switch (activeView) {
       case 'settings':
@@ -233,25 +232,7 @@ function App() {
         return <ChatView currentUser={currentUser} initialPropertyId={initialChatPropertyId} />;
       default: // 'main'
         if (role === UserRole.Admin) return <AdminView stats={adminStats} usersToVerify={usersToVerify} purchases={purchases} onConfirmVerification={handleConfirmVerification} onConfirmPurchase={handleConfirmPurchase} onRefreshData={fetchData}/>;
-        
-        if (role === UserRole.Owner) {
-          // Adiciona uma verificação extra para garantir que os dados do usuário existem
-          if (!currentUser.user) return <LoadingSpinner />; // Ou null
-
-          return (
-            <OwnerView
-              owner={currentUser.user as Owner}
-              properties={properties.data}
-              purchases={purchases}
-              onAddProperty={handleAddProperty}
-              onInitiatePurchase={handleInitiatePurchase}
-              onInitiateVerification={handleInitiateVerification}
-              onSelectProperty={handleSelectProperty}
-              onDeactivate={handleDeactivateProperty}
-              onReactivate={handleReactivateProperty}
-            />
-          );
-        }
+        if (role === UserRole.Owner) return <OwnerView owner={currentUser.user as Owner} properties={properties.data} purchases={purchases} onAddProperty={handleAddProperty} onInitiatePurchase={handleInitiatePurchase} onInitiateVerification={handleInitiateVerification} onSelectProperty={handleSelectProperty} onDeactivate={handleDeactivateProperty} onReactivate={handleReactivateProperty} />;
         if (role === UserRole.Client) return <ClientView client={currentUser.user as Client} properties={properties} purchases={purchases} onToggleFavorite={handleToggleFavorite} onSelectProperty={handleSelectProperty} onPageChange={handlePageChange} onFilterChange={handleFilterChange} currentFilters={filters} />;
         return null;
     }
