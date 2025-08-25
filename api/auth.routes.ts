@@ -91,10 +91,6 @@ router.get('/me', authMiddleware, async (req: Request, res: Response) => {
         finalProfile = userWithProfile; // Para ADMINs
     }
 
-    // Removemos os objetos aninhados para não duplicar dados
-    delete finalProfile.owner;
-    delete finalProfile.client;
-
     res.status(200).json(finalProfile);
 
   } catch (error) {
