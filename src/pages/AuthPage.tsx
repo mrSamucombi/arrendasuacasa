@@ -116,23 +116,23 @@ const AuthPage: React.FC = () => {
         </a>
         <div className="relative min-h-screen w-full flex flex-col items-center justify-center p-4">
       
-      {/* --- Elemento de Fundo Dedicado --- */}
-      <div 
-        className="absolute inset-0 w-full h-full bg-cover bg-center -z-10"
-        style={{ backgroundImage: "url('background.jpg')" }}
-      >
-        {/* Overlay escuro para garantir a legibilidade do conteúdo */}
-        <div className="absolute inset-0 w-full h-full bg-background/70 backdrop-blur-sm"></div>
-      </div>
+        {/* --- Elemento de Fundo Dedicado --- */}
+        <div 
+          className="absolute inset-0 w-full h-full bg-cover bg-center -z-10"
+          style={{ backgroundImage: "url('background.jpg')" }}
+        >
+          {/* Overlay escuro para garantir a legibilidade do conteúdo */}
+          <div className="absolute inset-0 w-full h-full bg-background/70 backdrop-blur-sm"></div>
+        </div>
 
-      {/* --- O seu conteúdo de formulário (sem alterações) --- */}
-      <div className="w-full max-w-md z-10"> {/* Adicionado z-10 para garantir que o conteúdo fica à frente */}
-        <a href="#/" className="flex flex-col items-center text-center mb-8 no-underline">
-          <HomeIcon className="w-12 h-12 text-blue mx-auto" />
-          <h1 className="text-4xl font-extrabold text-text mt-2">ArrendaSuaCasa</h1>
-          <p className="text-subtext">A sua plataforma de arrendamento em Angola</p>
-        </a>
-        <div className="bg-mantle rounded-xl shadow-lg p-8 border border-crust">
+        {/* --- O seu conteúdo de formulário (sem alterações) --- */}
+        <div className="w-full max-w-md z-10"> {/* Adicionado z-10 para garantir que o conteúdo fica à frente */}
+         <a href="#/" className="flex flex-col items-center text-center mb-8 no-underline">
+            <HomeIcon className="w-12 h-12 text-blue mx-auto" />
+            <h1 className="text-4xl font-extrabold text-text mt-2">ArrendaSuaCasa</h1>
+            <p className="text-subtext">A sua plataforma de arrendamento em Angola</p>
+          </a>
+          <div className="bg-mantle rounded-xl shadow-lg p-8 border border-crust">
           <div className="flex border-b border-crust mb-6">
             <button onClick={() => { setIsLoginView(true); setError(null); }} className={`flex-1 pb-3 text-lg font-semibold transition-colors duration-300 ${isLoginView ? 'text-blue border-b-2 border-blue' : 'text-subtext hover:text-text'}`}>
               Entrar
