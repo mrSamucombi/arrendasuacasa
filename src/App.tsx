@@ -264,6 +264,7 @@ function App() {
       </main>
       <Footer setActiveView={setActiveView} />
     </div>
+      
   );
 };
 
