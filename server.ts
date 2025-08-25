@@ -29,14 +29,10 @@ const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 // --- 4. Configuração de CORS ---
 // A lista de origens permitidas é mais segura e flexível.
 const allowedOrigins = [
-  'https://arrendasuacasa-front.onrender.com',
-  // Pode adicionar mais origens de produção aqui, como domínios customizados.
+  'http://localhost:5173', // Para desenvolvimento
+  'https://arrendasuacasa-front.onrender.com' // <-- URL DE PRODUÇÃO ADICIONADO
 ];
 
-// Em desenvolvimento, permitimos também o localhost.
-if (!IS_PRODUCTION) {
-  allowedOrigins.push('http://localhost:5173');
-}
 
 const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {
