@@ -37,6 +37,11 @@ const corsOptions = {
 // Esta linha é crucial para que o CORS funcione com pedidos POST/PUT que enviam headers
 app.options('*', cors(corsOptions));
 
+app.get('/api/test', (req, res) => {
+  console.log("!!! ROTA DE TESTE /api/test FOI ATINGIDA !!!");
+  res.status(200).json({ message: "A rota de teste no server.ts está a funcionar!" });
+});
+
 // Usa o middleware CORS para todos os outros pedidos
 app.use(cors(corsOptions));
 
