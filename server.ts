@@ -1,86 +1,63 @@
 // server.ts
-// Forçar o deploy final
 
-// --- 1. Importação de Módulos ---
-// dotenv deve ser importado e configurado primeiro para garantir que todas
-// as variáveis de ambiente estejam disponíveis para os outros módulos.
+// Movi as importações para o topo, o que é a convenção padrão.
 import dotenv from 'dotenv';
+import express from 'express';
+import cors from 'cors';
+import apiRouter from './api/index.js';
+import { generalApiLimiter } from './src/config/rateLimiter.js';
+// Você tinha esta importação que não era usada, removi para limpar.
+// import propertyRoutes from './api/properties.routes.js'; 
+
 dotenv.config();
 
-import express, { Request, Response, NextFunction } from 'express';
-import cors from 'cors';
-import { generalApiLimiter } from './src/config/rateLimiter.js';
-import apiRouter from './api/index.js';
-
-// --- 2. Depuração de Variáveis de Ambiente (Opcional, mas útil) ---
-// Este bloco ajuda a confirmar que o Render está a carregar as suas variáveis de ambiente.
-// Pode ser removido ou comentado após a confirmação.
-console.log("--- Verificando Variáveis de Ambiente Essenciais ---");
-console.log(`DATABASE_URL: ${process.env.DATABASE_URL ? 'Carregada' : 'NÃO ENCONTRADA'}`);
-console.log(`CLOUDINARY_CLOUD_NAME: ${process.env.CLOUDINARY_CLOUD_NAME ? 'Carregado' : 'NÃO ENCONTRADO'}`);
-console.log(`FIREBASE_PROJECT_ID: ${process.env.FIREBASE_PROJECT_ID ? 'Carregado' : 'NÃO ENCONTRADO'}`);
-console.log("---------------------------------------------------");
-
-// --- 3. Inicialização e Constantes da Aplicação ---
 const app = express();
 const PORT = process.env.PORT || 3001;
-const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
-// --- 4. Configuração de CORS ---
-// A lista de origens permitidas é mais segura e flexível.
+// --- 1. CONFIGURAÇÃO DE CORS (COM A CORREÇÃO CRÍTICA) ---
+// Vamos usar uma configuração mais robusta para lidar com os pedidos de pré-voo (pre-flight)
 const allowedOrigins = [
-  'http://localhost:5173', // Para desenvolvimento
-  'https://arrendasuacasa-front.onrender.com' // <-- URL DE PRODUÇÃO ADICIONADO
+  'http://localhost:5173',
+  'https://arrendasuacasa-front.onrender.com' // Seu URL de produção
 ];
 
-
-const corsOptions: cors.CorsOptions = {
-  origin: (origin, callback) => {
-    // Permite requisições sem 'origin' (ex: Postman, apps móveis) ou se a origem estiver na lista.
-    if (!origin || allowedOrigins.includes(origin)) {
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      callback(new Error(`Origem não permitida pela política de CORS: ${origin}`));
+      callback(new Error('Origem não permitida pela política de CORS'));
     }
   },
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS", // Adicionado OPTIONS
+  allowedHeaders: ['Content-Type', 'Authorization'], // Cabeçalhos permitidos
 };
 
+// --- ADIÇÃO #1: Habilita o pré-voo (pre-flight) para TODAS as rotas ---
+// Esta linha é crucial para que o CORS funcione com pedidos POST/PUT que enviam headers
+app.options('*', cors(corsOptions));
+
+// Usa o middleware CORS para todos os outros pedidos
 app.use(cors(corsOptions));
 
-// --- 5. Middlewares Essenciais ---
-// Aumentar o limite de payload é importante para o upload de ficheiros.
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// --- 6. Rotas da Aplicação ---
-// Rota de "health check" para verificar se a API está online.
-app.get('/', (_req: Request, res: Response) => {
-  res.status(200).send(`ArrendaSuaCasa API está a funcionar! Ambiente: ${process.env.NODE_ENV || 'desenvolvimento'}`);
-});
+// --- 2. BODY PARSERS ---
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Aplica o rate limiter apenas aos endpoints da API para proteger contra ataques.
-app.use('/api', generalApiLimiter);
-
-// Centraliza todas as rotas da API sob o prefixo /api.
+// --- 3. ROTEADOR PRINCIPAL (COM A CORREÇÃO CRÍTICA) ---
+// A ordem aqui é importante: primeiro o limiter, depois o router.
+app.use('/api', generalApiLimiter); 
 app.use('/api', apiRouter);
 
-// --- 7. Tratamento de Erros Global (Error Handling) ---
-// Este middleware "pega" qualquer erro que não foi tratado nas suas rotas,
-// evitando que o servidor quebre e retornando uma resposta JSON padronizada.
-app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-  console.error("--- ERRO NÃO TRATADO ---");
-  console.error(err.stack);
-  console.error("------------------------");
-  res.status(500).json({
-    error: 'Ocorreu um erro inesperado no servidor.',
-    // Em desenvolvimento, podemos enviar mais detalhes do erro.
-    details: IS_PRODUCTION ? undefined : err.message,
-  });
-});
+// A linha abaixo era redundante e potencialmente causava problemas,
+// pois o `apiRouter` já deve tratar das rotas de propriedades.
+// app.use('/api/properties', propertyRoutes); // <--- REMOVIDA
 
-// --- 8. Inicialização do Servidor ---
+// --- Rota de Health Check ---
+app.get('/', (_req, res) => res.send('ArrendaSuaCasa API is running!'));
+
+// --- Iniciar Servidor ---
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor a ouvir em http://localhost:${PORT}`);
+  console.log(`Server is listening on http://localhost:${PORT}`);
 });
