@@ -1,4 +1,4 @@
-// api/index.ts (VERSÃO FINAL E CORRIGIDA)
+// api/index.ts (VERSÃO FINAL E GARANTIDA)
 
 import { Router } from 'express';
 
@@ -15,8 +15,10 @@ import packagesRoutes from './packages.routes.js';
 
 const router = Router();
 
-// --- Ligação de todas as rotas ---
-router.use('/auth', authRoutes);
+// --- Ligação de todas as rotas aos seus caminhos base ---
+// Esta secção funciona como a "receção" da sua API.
+
+router.use('/auth', authRoutes); // <-- A LINHA MAIS IMPORTANTE PARA O SEU ERRO
 router.use('/properties', propertyRoutes);
 router.use('/purchases', purchaseRoutes);
 router.use('/upload', uploadRoutes);

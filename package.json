@@ -6,9 +6,15 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "vite",
-    "build:frontend": "npx tailwindcss -i ./src/index.css -o ./src/tailwind-output.css && vite build",
-    "build:backend": "npx prisma generate && tsc",
-    "start:backend": "node dist/server.js"
+    "build:frontend": "vite build",
+    "preview:frontend": "vite preview",
+    "build:backend": "tsc", 
+    "start:backend": "node dist-server/server.js", 
+    "build": "npm run build:backend && npm run build:frontend",
+    "start": "npm run start:backend",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "postinstall": "npx prisma generate"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
