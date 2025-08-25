@@ -2,7 +2,7 @@
 
 import { Router } from 'express';
 
-// Importação de TODOS os seus ficheiros de rotas
+// Importação de todos os seus ficheiros de rotas
 import authRoutes from './auth.routes.js';
 import propertyRoutes from './properties.routes.js';
 import purchaseRoutes from './purchase.routes.js';
