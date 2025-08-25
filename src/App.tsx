@@ -256,7 +256,21 @@ function App() {
   }
   
   return (
-    <div className="flex flex-col min-h-screen bg-background font-sans text-text">
+    <div className="relative flex flex-col min-h-screen bg-background font-sans text-text">
+      
+      <div 
+        className="
+          fixed inset-0 w-full h-full           /* Ocupa o ecrã inteiro e fica fixo */
+          bg-cover bg-center bg-no-repeat       /* Controla a imagem */
+          -z-10                                 /* Envia para trás de todo o conteúdo */
+          transition-opacity duration-1000      /* Efeito de fade-in suave */
+        "
+        style={{ backgroundImage: "url('/images/background.jpg')" }}
+      >
+        {/* Overlay e Efeito de Desfoque */}
+        <div className="absolute inset-0 w-full h-full bg-background/70 backdrop-blur-sm"></div>
+      </div>
+    
       <Toaster position="top-right" toastOptions={{ className: 'bg-surface text-text border border-crust shadow-lg' }} />
       <Navbar userRole={currentUser.role} onLogout={handleLogout} currentUser={currentUser} onAdminLogout={handleAdminLogout} setActiveView={setActiveView} hasUnreadMessages={hasUnreadMessages} />
       <main className="flex-grow container mx-auto p-4 md:p-8">

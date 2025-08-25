@@ -10,7 +10,7 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'fire
 // Desta forma, ele é declarado apenas uma vez.
 const InputField: React.FC<React.InputHTMLAttributes<HTMLInputElement> & { label: string }> = ({ label, id, ...props }) => (
   <div>
-    <label htmlFor={id} className="block text-sm font-medium text-text">{label}</label>
+    <label htmlFor={id} className="block text-sm font-medium text-gray-900  ">{label}</label>
     <input
       id={id}
       {...props}
