@@ -22,15 +22,15 @@ const allowedOrigins = [
 ];
 
 const corsOptions = {
-  origin: function (origin, callback) {
+  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       callback(new Error('Origem não permitida pela política de CORS'));
     }
   },
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS", // Adicionado OPTIONS
-  allowedHeaders: ['Content-Type', 'Authorization'], // Cabeçalhos permitidos
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
 // --- ADIÇÃO #1: Habilita o pré-voo (pre-flight) para TODAS as rotas ---
