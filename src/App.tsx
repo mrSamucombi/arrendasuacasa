@@ -9,6 +9,9 @@ import AdminView from '../src/pages/AdminView';
 import SettingsPage from '../src/pages/SettingsPage';
 import HelpCenterPage from '../src/pages/HelpCenterPage';
 import TermsPage from '../src/pages/TermsPage';
+import Footer from '../src/components/Footer';
+// Crie este ficheiro também, copiando o TermsPage
+// import PrivacyPolicyPage from '../src/pages/PrivacyPolicyPage';
 import ClientProfilePage from '../src/pages/ClientProfilePage';
 import OwnerProfilePage from '../src/pages/OwnerProfilePage';
 import PropertyDetailPage from '../src/pages/PropertyDetailPage';
@@ -39,7 +42,7 @@ function App() {
   const [isAdminMode, setIsAdminMode] = useState(false);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [isDataLoading, setIsDataLoading] = useState(false);
-  const [activeView, setActiveView] = useState<'main' | 'settings' | 'help' | 'terms' | 'my-profile' | 'owner-profile' | 'messages'>('main');
+  const [activeView, setActiveView] = useState<'main' | 'settings' | 'help' | 'terms' | 'privacy' | 'my-profile' | 'owner-profile' | 'messages'>('main');
   const [hasConsented, setHasConsented] = useState(() => localStorage.getItem('arrenda-sua-casa-consent') === 'true');
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState({});
@@ -224,6 +227,8 @@ function App() {
         return <HelpCenterPage />;
       case 'terms':
         return <TermsPage />;
+      case 'privacy':
+        return <PrivacyPolicyPage />;
       case 'my-profile':
         return currentUser.role === UserRole.Client ? <ClientProfilePage client={currentUser.user as Client} onToggleFavorite={handleToggleFavorite} onSelectProperty={handleSelectProperty}/> : null;
       case 'owner-profile':
@@ -257,8 +262,7 @@ function App() {
       <main className="flex-grow container mx-auto p-4 md:p-8">
         {isDataLoading ? <div className="flex justify-center mt-16"><LoadingSpinner /></div> : renderView()}
       </main>
-      <footer className="bg-surface text-subtext text-center p-4 mt-auto border-t border-crust"><p>© {new Date().getFullYear()} ArrendaSuaCasa. Todos os direitos reservados.</p></footer>
-    </div>
+      <Footer setActiveView={setActiveView} />
   );
 }
 
