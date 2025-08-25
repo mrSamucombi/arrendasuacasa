@@ -154,7 +154,7 @@ const AuthPage: React.FC = () => {
                 {isLoading ? 'A entrar...' : 'Entrar'}
               </Button>
             </form>
-          ) : (
+            ) : (
             <form onSubmit={handleRegister} className="space-y-6">
               <InputField label="Nome Completo" id="register-name" name="register-name" type="text" value={registerName} onChange={e => setRegisterName(e.target.value)} required />
               <InputField label="Email" id="register-email" name="register-email" type="email" value={registerEmail} onChange={e => setRegisterEmail(e.target.value)} required />
