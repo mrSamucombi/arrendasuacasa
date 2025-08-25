@@ -21,10 +21,10 @@ module.exports = {
 
     // Paleta Principal (A Grande Mudança)
     'text': '#ECEFF4',       // Texto principal (quase branco)
-    'subtext': '#2E3440',   // Texto secundário (cinza claro)
+    'subtext': '#D8DEE9',   // Texto secundário (cinza claro)
     
     'background': '#2E3440', // Fundo principal (cinza-azulado muito escuro)
-    'surface': '#3B4252',    // Fundo de "cartas", navbar, painéis (um tom mais claro)
+    'surface': '#D8DEE9',  //#3B4252    // Fundo de "cartas", navbar, painéis (um tom mais claro)
     'crust': '#4C566A',      // Bordas e separadores (um tom ainda mais claro)
     
     // Cores de Interação (para botões, links, etc.)
