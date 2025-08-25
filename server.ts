@@ -1,4 +1,5 @@
 // server.ts
+// Forçar o deploy final
 
 // --- 1. Importação de Módulos ---
 // dotenv deve ser importado e configurado primeiro para garantir que todas
