@@ -263,7 +263,8 @@ function App() {
         {isDataLoading ? <div className="flex justify-center mt-16"><LoadingSpinner /></div> : renderView()}
       </main>
       <Footer setActiveView={setActiveView} />
+    </div>
   );
-}
+};
 
 export default App;
