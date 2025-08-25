@@ -10,11 +10,18 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'fire
 // Desta forma, ele é declarado apenas uma vez.
 const InputField: React.FC<React.InputHTMLAttributes<HTMLInputElement> & { label: string }> = ({ label, id, ...props }) => (
   <div>
-    <label htmlFor={id} className="block text-sm font-medium text-gray-900  ">{label}</label>
+    <label htmlFor={id} className="block text-sm font-medium text-text">{label}</label>
     <input
       id={id}
       {...props}
-      className="mt-1 block w-full rounded-lg border-crust shadow-sm focus:border-blue focus:ring focus:ring-blue focus:ring-opacity-50 transition"
+      className="
+        mt-1 block w-full rounded-lg 
+        bg-surface border-crust               /* Cor de fundo e borda escuras do seu tema */
+        text-text                            /* <<< A CORREÇÃO PRINCIPAL: Texto claro */
+        placeholder:text-subtext             /* Cor do placeholder */
+        focus:border-primary focus:ring-primary /* Estilos de foco com a sua cor primária */
+        shadow-sm transition
+      "
     />
   </div>
 );
