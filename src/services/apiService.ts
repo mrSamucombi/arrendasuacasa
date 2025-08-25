@@ -1,11 +1,11 @@
 import { auth } from '../firebase';
-import type { AuthenticatedUser, CoinPackage, Property, Purchase, UserRole, Owner } from '../types';
+import type { AuthenticatedUser, CoinPackage, Property, Purchase, UserRole, Owner, Client } from '../types';
 
-const API_BASE_URL = import.meta.env.PROD 
-  ? import.meta.env.VITE_API_BASE_URL 
-  : '/api';
+// A forma mais robusta de definir o URL base.
+// Em produção (no Render), ele vai usar a variável de ambiente VITE_API_BASE_URL.
+// Em desenvolvimento (localmente), ele vai usar o endereço do seu servidor local.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
 
-// Adicionado o tipo para a resposta paginada que vem do backend
 interface PaginatedPropertiesResponse {
   data: Property[];
   pagination: {
@@ -22,8 +22,6 @@ interface PropertyFilters {
   bedrooms?: string;
 }
 
-
-
 // --- Helper genérico para fazer chamadas JSON autenticadas ---
 async function fetchWithAuth(url: string, options: RequestInit = {}) {
   const user = auth.currentUser;
@@ -38,6 +36,7 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
     ...options.headers,
   };
 
+  console.log(`[API Service] A fazer pedido: ${options.method || 'GET'} ${url}`);
   return fetch(url, { ...options, headers });
 }
 
@@ -47,7 +46,8 @@ async function handleResponse(response: Response) {
     const errorData = await response.json().catch(() => ({
       error: `API call failed with status ${response.status}`,
     }));
-    throw new Error(errorData.error || 'Ocorreu um erro desconhecido');
+    console.error(`[API Service] Erro na resposta da API para ${response.url}:`, errorData);
+    throw new Error(errorData.error || `Ocorreu um erro desconhecido (status: ${response.status})`);
   }
   if (response.status === 204) {
     return null;
@@ -59,9 +59,6 @@ async function handleResponse(response: Response) {
 export async function uploadFile(file: File, path?: string): Promise<string> {
   const user = auth.currentUser;
   if (!user) throw new Error('Utilizador não autenticado para fazer upload.');
-
-  // Usar o caminho fornecido ou um caminho padrão
-  const finalPath = path || `uploads/${user.uid}/general`;
 
   const formData = new FormData();
   formData.append('file', file);
@@ -87,7 +84,7 @@ export async function deactivateProperty(propertyId: string): Promise<Property> 
 
 export async function reactivateProperty(propertyId: string): Promise<any> {
   const response = await fetchWithAuth(`${API_BASE_URL}/properties/${propertyId}/reactivate`, { method: 'PATCH' });
-  return handleResponse(response); // A resposta agora contém 'updatedProperty' e 'updatedOwner'
+  return handleResponse(response);
 }
 
 // --- Autenticação ---
@@ -100,12 +97,11 @@ export async function registerUser(data: { id: string; name: string; email: stri
   return handleResponse(response);
 }
 
-export async function getMyProfile(): Promise<AuthenticatedUser> { // O tipo AuthenticatedUser deve ser o objeto do utilizador
+export async function getMyProfile(): Promise<AuthenticatedUser> {
   const response = await fetchWithAuth(`${API_BASE_URL}/auth/me`);
-  const data = await handleResponse(response); // handleResponse retorna { user: {...}, role: '...' }
-
-  // Retornamos o objeto aninhado que contém os detalhes
-  return data.user; 
+  const data = await handleResponse(response);
+  // CORREÇÃO: A API agora retorna o objeto do utilizador diretamente.
+  return data; 
 }
 
 // --- Rotas Públicas ---
@@ -121,10 +117,6 @@ export async function getProperties(page: number = 1, filters: PropertyFilters =
   if (filters.bedrooms) queryParams.append('bedrooms', filters.bedrooms);
 
   const finalUrl = `${API_BASE_URL}/properties?${queryParams.toString()}`;
-
-  // LOG DE DEPURAÇÃO
-  console.log("A buscar imóveis com o URL:", finalUrl);
-
   const response = await fetch(finalUrl);
   return handleResponse(response);
 }
@@ -142,9 +134,9 @@ export async function getClientPurchases(): Promise<Purchase[]> {
 
 export async function initiatePurchase(pkgId: string, proofOfPaymentFile: File): Promise<Purchase> {
   const proofOfPaymentUrl = await uploadFile(proofOfPaymentFile);
-  const response = await fetchWithAuth(`${API_BASE_URL}/purchases`, {
+  const response = await fetchWithAuth(`${API_.../purchases`, {
     method: 'POST',
-    body: JSON.stringify({ pkgId, proofOfPayment: proofOfPaymentUrl }),
+    body: JSON.stringify({ pkgId, proofOfPaymentUrl }), // Corrigido para corresponder ao schema
   });
   return handleResponse(response);
 }
@@ -165,14 +157,14 @@ export async function initiateVerification(ownerId: string, data: { email: strin
   return handleResponse(response);
 }
 
-export async function toggleFavorite(propertyId: string): Promise<Client> { // Tipo de retorno atualizado
+export async function toggleFavorite(propertyId: string): Promise<Client> {
     const response = await fetchWithAuth(`${API_BASE_URL}/clients/toggle-favorite/${propertyId}`, {
         method: 'POST',
     });
     return handleResponse(response);
 }
 
-export async function addProperty(propertyData: Omit<Property, 'id' | 'ownerId' | 'imageUrls' | 'favoritedBy' | 'createdAt' | 'updatedAt'>, images: File[]): Promise<Property> {
+export async function addProperty(propertyData: Omit<Property, 'id' | 'ownerId' | 'imageUrls' | 'favoritedBy' | 'createdAt' | 'updatedAt' | 'status' | 'conversations'>, images: File[]): Promise<{ newProperty: Property, updatedOwner: Owner }> {
   if (images.length === 0) throw new Error("Pelo menos uma imagem é necessária.");
   if (!auth.currentUser) throw new Error("Ação requer autenticação.");
   const uploadPromises = images.map(image => uploadFile(image));
@@ -198,19 +190,6 @@ export async function updateMyProfile(data: ProfileUpdateData): Promise<Authenti
     body: JSON.stringify(data),
   });
   return handleResponse(response);
-}
-
-export async function getOwnerDashboardData() {
-  // Usamos Promise.all para fazer as chamadas em paralelo, o que é mais rápido.
-  const [profile, properties, purchases] = await Promise.all([
-    getMyProfile(), // Você já tem esta função
-    // Crie uma função getMyProperties se não tiver
-    // Ou adapte a getProperties para buscar apenas os do usuário logado
-    getProperties(), // Adapte se necessário
-    getClientPurchases() // Você já tem esta função
-  ]);
-
-  return { profile, properties, purchases };
 }
 
 // --- Rotas de Administrador ---
@@ -239,18 +218,17 @@ export async function confirmPurchase(purchaseId: string): Promise<Purchase> {
   return handleResponse(response);
 }
 
+// --- Rotas de Mensagens ---
 export async function getMyConversations(): Promise<any[]> {
   const response = await fetchWithAuth(`${API_BASE_URL}/messages`);
   return handleResponse(response);
 }
 
-// Obter ou criar uma conversa sobre um imóvel específico
 export async function getConversationByProperty(propertyId: string): Promise<any> {
   const response = await fetchWithAuth(`${API_BASE_URL}/messages/property/${propertyId}`);
   return handleResponse(response);
 }
 
-// Enviar uma nova mensagem para uma conversa
 export async function sendMessage(conversationId: string, text: string): Promise<any> {
   const response = await fetchWithAuth(`${API_BASE_URL}/messages/${conversationId}`, {
     method: 'POST',
