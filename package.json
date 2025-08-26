@@ -7,13 +7,10 @@
   "scripts": {
     "dev": "vite",
     "build:frontend": "vite build",
-    "preview": "vite preview",
     "build:backend": "tsc",
-    "start:backend": "node dist/server.js",
-    "build": "npm run build:backend && npm run build:frontend",
-    "start": "npm run start:backend",
+    "build": "npm install && npm run build:backend && npm run build:frontend",
+   "start": "node dist/server.js",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
     "postinstall": "npx prisma generate"
   },
   "dependencies": {
