@@ -1,0 +1,56 @@
+// api/upload.routes.ts
+import { Router } from 'express';
+import multer from 'multer';
+import cloudinary from '../lib/cloudinary.js';
+import { checkAuth } from '../middleware/auth.middleware.js';
+import path from 'path';
+const router = Router();
+const storage = multer.memoryStorage();
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 10 * 1024 * 1024 }, // Limite de 10 MB
+});
+router.post('/', checkAuth, upload.single('file'), async (req, res) => {
+    // As nossas verificações de segurança continuam aqui. Elas garantem a lógica.
+    if (!req.user || !req.file) {
+        return res.status(400).json({ error: 'Utilizador não autenticado ou nenhum ficheiro enviado.' });
+    }
+    // --- AFIRMAÇÃO DE TIPO (A Correção) ---
+    // A partir deste ponto, dizemos ao TypeScript que 'req' tem as nossas propriedades.
+    const authenticatedReq = req;
+    try {
+        const rawFileTypes = ['application/pdf'];
+        // Usamos authenticatedReq a partir de agora
+        const resourceType = rawFileTypes.includes(authenticatedReq.file.mimetype) ? 'raw' : 'image';
+        const filename = `${path.parse(authenticatedReq.file.originalname).name}_${Date.now()}`;
+        const uploadResponse = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream({
+                folder: `arrendasuacasa/${authenticatedReq.user.uid}`,
+                resource_type: resourceType,
+                public_id: filename
+            }, (error, result) => {
+                if (error)
+                    return reject(error);
+                resolve(result);
+            });
+            uploadStream.end(authenticatedReq.file.buffer);
+        });
+        const result = uploadResponse;
+        let finalUrl = result.secure_url;
+        if (resourceType === 'raw') {
+            finalUrl = cloudinary.url(result.public_id, {
+                resource_type: 'raw',
+                flags: [`attachment:${authenticatedReq.file.originalname.replace(/\s+/g, '_')}`]
+            });
+        }
+        res.status(200).json({ url: finalUrl });
+    }
+    catch (error) {
+        console.error("Erro no upload para o Cloudinary:", error);
+        if (error instanceof Error) {
+            return res.status(500).json({ error: 'Falha no upload do ficheiro.', details: error.message });
+        }
+        res.status(500).json({ error: 'Ocorreu um erro desconhecido durante o upload.' });
+    }
+});
+export default router;
