@@ -9,7 +9,7 @@
     "build:frontend": "vite build",
     "preview:frontend": "vite preview",
     "build:backend": "tsc", 
-    "start:backend": "node dist-server/server.js", 
+     "start:backend": "node build-api/server.js", 
     "build": "npm run build:backend && npm run build:frontend",
     "start": "npm run start:backend",
     "prisma:generate": "prisma generate",
