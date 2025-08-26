@@ -58,6 +58,8 @@ coverage/
 # Ignorar ficheiros JavaScript compilados na pasta fonte
 *.js
 *.js.map
+
+# Adicionar exceções para os ficheiros de configuração importantes
 !vite.config.js
-!postcss.config.cjs
 !tailwind.config.js
+!postcss.config.cjs

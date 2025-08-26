@@ -13,8 +13,8 @@
     "allowJs": true // Adicionado por segurança
   },
   "include": [
-    "server.ts",
-    "api/**/*.ts",
+    "Apip/server.ts",
+    "apii/api/**/*.ts",
     "lib/**/*.ts",
     "middleware/**/*.ts"
   ],

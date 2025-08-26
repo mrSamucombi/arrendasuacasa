@@ -4,8 +4,8 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
-import apiRouter from './api/index.js';
-import { generalApiLimiter } from './src/config/rateLimiter.js';
+import apiRouter from './apii/api/index.js';
+import { generalApiLimiter } from '../src/config/rateLimiter.js';
 // Você tinha esta importação que não era usada, removi para limpar.
 // import propertyRoutes from './api/properties.routes.js'; 
 
