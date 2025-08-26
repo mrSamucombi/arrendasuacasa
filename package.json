@@ -1,4 +1,4 @@
-// package.json (na raiz)
+
 {
   "name": "arrendasuacasa-frontend",
   "private": true,
@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@heroicons/react": "^2.0.18", // Exemplo, adicione se usar
+    "@heroicons/react": "^2.0.18",
     "@hookform/resolvers": "^3.1.1",
     "firebase": "^10.1.0",
     "react": "^18.2.0",
