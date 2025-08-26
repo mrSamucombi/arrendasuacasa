@@ -134,9 +134,9 @@ export async function getClientPurchases(): Promise<Purchase[]> {
 
 export async function initiatePurchase(pkgId: string, proofOfPaymentFile: File): Promise<Purchase> {
   const proofOfPaymentUrl = await uploadFile(proofOfPaymentFile);
-  const response = await fetchWithAuth(`${API_.../purchases`, {
+  const response = await fetchWithAuth(`${API_BASE_URL}/purchases`, {
     method: 'POST',
-    body: JSON.stringify({ pkgId, proofOfPaymentUrl }), // Corrigido para corresponder ao schema
+    body: JSON.stringify({ pkgId, proofOfPaymentUrl }),
   });
   return handleResponse(response);
 }
