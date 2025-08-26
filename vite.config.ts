@@ -46,9 +46,3 @@ export default defineConfig({
     sourcemap: true, // Gera sourcemaps para facilitar a depuração em produção
   },
 });
-// Forçar deploy
-
-// Adicionar exceções para os ficheiros de configuração importantes
-!vite.config.js
-!tailwind.config.js
-!postcss.config.cjs
