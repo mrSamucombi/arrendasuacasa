@@ -47,3 +47,8 @@ export default defineConfig({
   },
 });
 // Forçar deploy
+
+// Adicionar exceções para os ficheiros de configuração importantes
+!vite.config.js
+!tailwind.config.js
+!postcss.config.cjs
