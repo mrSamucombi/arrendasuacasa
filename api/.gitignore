@@ -2,4 +2,6 @@
 dist/  
 # Ignora a pasta dist da raiz (do frontend)
 # A pasta mais importante a ignorar. Contém todas as dependências.
-# node_modules/
+
+!node_modules/@prisma
+!node_modules/@prisma/client

@@ -16,7 +16,7 @@ node_modules/
 # Arquivos de Build e Saída (Importantes para o Deploy)
 # ========================================================================
 # A pasta de build do Vite (frontend)
-dist/
+# dist/
 
 # A pasta de build do TypeScript (backend)
 # Se você tiver uma pasta 'dist' na raiz para o backend
