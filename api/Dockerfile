@@ -1,35 +1,26 @@
 # Dockerfile para a API "ArrendaSuaCasa"
 
-# --- 1. Imagem Base ---
-# Começamos com uma imagem oficial do Node.js, versão 20.
-# A versão "alpine" é mais pequena e segura.
+# 1. Imagem Base
 FROM node:20-alpine
 
-# --- 2. Preparar o Ambiente ---
-# Define a pasta de trabalho dentro do contentor
+# 2. Preparar o Ambiente
 WORKDIR /app
 
-# --- 3. Copiar o package.json e Instalar Dependências ---
-# Copia os ficheiros de dependências primeiro para aproveitar o cache do Docker.
-# Se estes ficheiros não mudarem, o Docker não reinstala tudo de novo.
+# 3. Copiar ficheiros de dependências e instalar
 COPY package.json ./
 COPY package-lock.json ./
-
-# Instala apenas as dependências de PRODUÇÃO
 RUN npm install --omit=dev
 
-# --- 4. Copiar o Resto do Código ---
-# Copia o schema do Prisma
-COPY prisma ./prisma/
+# 4. Copiar o resto do código-fonte e o schema
+COPY . .
 
-# Copia o código-fonte compilado (a pasta dist)
-COPY dist ./dist/
+# 5. Construir (compilar) a aplicação DENTRO do contentor
+# Isto garante que a pasta 'dist' é criada no ambiente de produção
+RUN npm run build
 
-# --- 5. Expor a Porta ---
-# Informa ao Docker que a nossa aplicação corre na porta 3001
-# O Hugging Face irá mapear a sua porta pública para esta.
+# 6. Expor a Porta
+# A sua aplicação corre na porta 3001, o Hugging Face irá expor a porta 7860
 EXPOSE 3001
 
-# --- 6. Comando de Arranque ---
-# O comando que será executado quando o contentor iniciar.
+# 7. Comando de Arranque (agora aponta para a pasta dist)
 CMD [ "npm", "run", "start" ]
