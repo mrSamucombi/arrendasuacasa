@@ -18,3 +18,16 @@ View your app in AI Studio: https://ai.studio/apps/drive/15g1FabOHnRNbSE_Pz8WUtj
 2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
 3. Run the app:
    `npm run dev`
+
+---
+title: ArrendaSuaCasa API
+emoji: 🏠
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_file: api/Dockerfile
+---
+
+# API da Plataforma ArrendaSuaCasa
+
+Este é o backend da aplicação ArrendaSuaCasa, a correr num contentor Docker.
