@@ -6,7 +6,7 @@ import { checkAuth as authMiddleware } from '../middleware/auth.middleware.js';
 import { registerUserSchema } from '../lib/schemas.js';
 import { UserRole } from '@prisma/client';
 import { z } from 'zod';
-import { authLimiter } from '../src/config/rateLimiter.js'; 
+import { authLimiter } from '../lib/rateLimiter.js'; 
 
 const router = Router();
 

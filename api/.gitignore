@@ -1,0 +1,5 @@
+# .gitignore (na raiz)
+dist/  
+# Ignora a pasta dist da raiz (do frontend)
+# A pasta mais importante a ignorar. Contém todas as dependências.
+# node_modules/

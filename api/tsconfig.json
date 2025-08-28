@@ -1,25 +1,22 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    //"outDir": "./dist",
-    "rootDir": ".",
-    "strict": true,
+    "target": "es2020",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "outDir": "dist",
     "esModuleInterop": true,
-    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "typeRoots": ["./types", "./node_modules/@types"],
-    "allowJs": true // Adicionado por segurança
+    "strict": true,
+    "skipLibCheck": true
   },
   "include": [
-    "Apip/server.ts",
-    "apii/api/**/*.ts",
+    "server.ts",
+    "routes/**/*.ts",
     "lib/**/*.ts",
-    "middleware/**/*.ts"
+    "middleware/**/*.ts",
+    "types/**/*.ts" 
   ],
   "exclude": [
-    "node_modules",
-    "src"
+    "node_modules"
   ]
 }
